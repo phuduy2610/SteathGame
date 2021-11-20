@@ -8,6 +8,10 @@ public class Guard : MonoBehaviour
     public Transform pathHolder;
     public float waitTime = 0.5f;
     public float turnSpeed = 90;
+
+    public Light spotLight;
+    public float viewDistance;
+    float viewAngle;
     private void OnDrawGizmos()
     {
         Vector3 startPosition = pathHolder.GetChild(0).position;
@@ -18,10 +22,16 @@ public class Guard : MonoBehaviour
             Gizmos.DrawLine(previousPosition, waypoint.position);
             previousPosition = waypoint.position;
         }
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position,transform.forward * viewDistance);
     }
     // Start is called before the first frame update
     void Start()
     {
+        viewAngle = spotLight.spotAngle;
+
+
         Vector3[] waypoints = new Vector3[pathHolder.childCount];
         for (int i = 0; i < waypoints.Length; i++)
         {
