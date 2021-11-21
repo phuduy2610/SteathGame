@@ -10,39 +10,54 @@ public class Player : MonoBehaviour
     float angle;
     float smoothInputMatgnitude;
     float smoothMoveVelocity;
-
+    bool disabled;
     Rigidbody myRigidBody;
     // Start is called before the first frame update
     float xDir, zDir;
     Vector3 velocity;
-
+    Vector3 direction;
     void Start()
     {
+        disabled = false;
         myRigidBody = GetComponent<Rigidbody>();
+        Guard.OnGuardHasSpottedPlayer += Disable;
     }
 
     // Update is called once per frame
     void Update()
     {
-        xDir = Input.GetAxisRaw("Horizontal");
-        zDir = Input.GetAxisRaw("Vertical");
-        Vector3 direction = (new Vector3(xDir,0,zDir)).normalized;
+        direction = Vector3.zero;
+        if (!disabled)
+        {
 
-        smoothInputMatgnitude = Mathf.SmoothDamp(smoothInputMatgnitude,direction.magnitude,ref smoothMoveVelocity,smoothMoveTime);
-        //Moving
-        Vector3 moveAmount = direction * speed * Time.deltaTime;
-        transform.Translate(moveAmount*smoothInputMatgnitude,Space.World);
+            xDir = Input.GetAxisRaw("Horizontal");
+            zDir = Input.GetAxisRaw("Vertical");
+            direction = (new Vector3(xDir, 0, zDir)).normalized;
 
-        //Rotate
-        float targetAngle = Mathf.Atan2(direction.x,direction.z)*Mathf.Rad2Deg;
-        angle = Mathf.LerpAngle(angle,targetAngle,turnSpeed*Time.deltaTime * direction.magnitude);
+        }
 
-        velocity = transform.forward * speed * smoothInputMatgnitude;
+
+
     }
 
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
+        smoothInputMatgnitude = Mathf.SmoothDamp(smoothInputMatgnitude, direction.magnitude, ref smoothMoveVelocity, smoothMoveTime);
+        //Moving
+        Vector3 moveAmount = direction * speed * Time.deltaTime;
+
+        //Rotate
+        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        angle = Mathf.LerpAngle(angle, targetAngle, turnSpeed * Time.deltaTime * direction.magnitude);
+
+        velocity = transform.forward * speed * smoothInputMatgnitude;
         myRigidBody.MoveRotation(Quaternion.Euler(Vector3.up * angle));
-        myRigidBody.MovePosition(myRigidBody.position + velocity*Time.deltaTime);
+        myRigidBody.MovePosition(myRigidBody.position + velocity * Time.deltaTime);
+    }
+
+    void Disable()
+    {
+        disabled = true;
     }
 
     // IEnumerator Move()
