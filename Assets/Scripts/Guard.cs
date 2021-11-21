@@ -40,7 +40,6 @@ public class Guard : MonoBehaviour
         originalSpotlightColor = spotLight.color;
         player = GameObject.FindGameObjectWithTag("Player").transform;
         viewAngle = spotLight.spotAngle;
-        print(viewAngle);
 
         Vector3[] waypoints = new Vector3[pathHolder.childCount];
         for (int i = 0; i < waypoints.Length; i++)
