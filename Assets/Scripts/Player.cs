@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
+    public static event System.Action OnPlayerFinish;
     public float speed;
     public float smoothMoveTime = 0.1f;
     public float turnSpeed = 8;
@@ -58,6 +60,23 @@ public class Player : MonoBehaviour
     void Disable()
     {
         disabled = true;
+    }
+
+    private void OnDestroy()
+    {
+        Guard.OnGuardHasSpottedPlayer -= Disable;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Finish")
+        {
+            Disable();
+            if (OnPlayerFinish != null)
+            {
+                OnPlayerFinish();
+            }
+        }
     }
 
     // IEnumerator Move()
